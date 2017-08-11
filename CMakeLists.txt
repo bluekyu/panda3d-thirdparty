@@ -3,11 +3,32 @@
 
 cmake_minimum_required(VERSION 2.8.3)
 
+option(use_bullet "Use bullet" OFF)
+option(use_fcollada "Use fcollada" OFF)
+option(use_vrpn "Use vrpn" OFF)
+option(use_tiff "Use tiff" OFF)
+option(use_ode "Use ode" OFF)
+option(use_artoolkit "Use artoolkit" OFF)
+option(use_nvidiacg "Use nvidiacg" OFF)
+option(use_openssl "Use openssl" OFF)
+option(use_openexr "Use openexr" OFF)
+option(use_ffmpeg "Use ffmpeg" OFF)
+
 include(ExternalProject)
 
 if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
-  string(REPLACE " " ";" WORDS ${CMAKE_GENERATOR})
-  list(GET WORDS 2 VCVER)
+  set(VCVER "")
+  if((MSVC_VERSION EQUAL 1910) OR (MSVC_VERSION EQUAL 1900))
+    set(VCVER "14")
+  elseif(MSVC_VERSION EQUAL 1800)
+    set(VCVER "12")
+  elseif(MSVC_VERSION EQUAL 1700)
+    set(VCVER "11")
+  elseif(MSVC_VERSION EQUAL 1600)
+    set(VCVER "10")
+  else()
+    message(FATAL_ERROR "Unknown Visual Studio.")
+  endif()
   set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/win-libs-vc${VCVER})
 
   if(CMAKE_GENERATOR MATCHES "Win64$")
@@ -123,6 +144,7 @@ if(NOT APPLE)
     DEPENDS zlib
     GIT_REPOSITORY https://github.com/rdb/assimp.git
     GIT_TAG not-broken
+    GIT_PROGRESS 1
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
@@ -134,6 +156,7 @@ if(NOT APPLE)
   )
 endif()
 
+if(use_bullet)
 ExternalProject_Add(
   bullet
   #GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
@@ -153,6 +176,7 @@ ExternalProject_Add(
     -DINCLUDE_INSTALL_DIR:STRING=include/
   INSTALL_DIR ${THIRDPARTY_DIR}/bullet
 )
+endif(use_bullet)
 
 ExternalProject_Add(
   freetype
@@ -196,6 +220,7 @@ ExternalProject_Add(
   openal
   GIT_REPOSITORY https://github.com/kcat/openal-soft.git
   GIT_TAG e270a9784bdacecedb98312a4e2e9ef75ef7df62
+  GIT_PROGRESS 1
 
   CMAKE_ARGS ${COMMON_CMAKE_ARGS}
     -DLIBTYPE=STATIC
@@ -237,6 +262,7 @@ ExternalProject_Add(
   INSTALL_DIR ${THIRDPARTY_DIR}/squish
 )
 
+if(use_fcollada)
 ExternalProject_Add(
   fcollada
   GIT_REPOSITORY https://github.com/rdb/fcollada.git
@@ -246,12 +272,15 @@ ExternalProject_Add(
     -DBUILD_TESTS=OFF
   INSTALL_DIR ${THIRDPARTY_DIR}/fcollada
 )
+endif(use_fcollada)
 
+if(use_vrpn)
 ExternalProject_Add(
   vrpn
   # Pull from git since 7.33 has some compile issues
   GIT_REPOSITORY https://github.com/vrpn/vrpn.git
   GIT_TAG 9cfc1a536f39e8815066c39a1cef0f8a515a2860
+  GIT_PROGRESS 1
 
   CMAKE_ARGS ${COMMON_CMAKE_ARGS}
     -DQUATLIB_BUILD_EXAMPLES=OFF
@@ -266,7 +295,9 @@ ExternalProject_Add(
     -DBUILD_TESTING=FALSE
   INSTALL_DIR ${THIRDPARTY_DIR}/vrpn
 )
+endif(use_vrpn)
 
+if(use_tiff)
 ExternalProject_Add(
   tiff
   DEPENDS zlib jpeg
@@ -285,6 +316,7 @@ ExternalProject_Add_Step(tiff remove_extras
   COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/share"
   DEPENDEES install
 )
+endif(use_tiff)
 
 ExternalProject_Add(
   eigen
@@ -299,6 +331,7 @@ ExternalProject_Add(
   INSTALL_DIR ${THIRDPARTY_DIR}/eigen
 )
 
+if(use_ode)
 ExternalProject_Add(
   ode
   URL https://bitbucket.org/odedevs/ode/downloads/ode-0.13.1.tar.gz
@@ -310,7 +343,9 @@ ExternalProject_Add(
   CMAKE_ARGS ${COMMON_CMAKE_ARGS}
   INSTALL_DIR ${THIRDPARTY_DIR}/ode
 )
+endif(use_ode)
 
+if(use_artoolkit)
 ExternalProject_Add(
   artoolkit
   URL http://www.panda3d.org/download/noversion/ARToolKit-2.72.1.tgz
@@ -322,7 +357,9 @@ ExternalProject_Add(
   CMAKE_ARGS ${COMMON_CMAKE_ARGS} -DCMAKE_OSX_ARCHITECTURES=i386$<SEMICOLON>x86_64
   INSTALL_DIR ${THIRDPARTY_DIR}/artoolkit
 )
+endif(use_artoolkit)
 
+if(use_nvidiacg)
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     ExternalProject_Add(
@@ -384,7 +421,9 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     )
   endif()
 endif()
+endif(use_nvidiacg)
 
+if(use_openssl)
 if(MSVC)
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ssl_config VC-WIN64A)
@@ -427,7 +466,9 @@ if(NOT APPLE)
     DEPENDEES install
   )
 endif()
+endif(use_openssl)
 
+if(use_openexr)
 ExternalProject_Add(
   openexr
   DEPENDS zlib
@@ -448,7 +489,9 @@ ExternalProject_Add_Step(openexr remove_extras
   COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/share"
   DEPENDEES install
 )
+endif(use_openexr)
 
+if(use_ffmpeg)
 if(NOT WIN32)
   EXTERNALPROJECT_ADD(
     ffmpeg
@@ -463,3 +506,4 @@ if(NOT WIN32)
     INSTALL_DIR ${THIRDPARTY_DIR}/ffmpeg
   )
 endif()
+endif(use_ffmpeg)
