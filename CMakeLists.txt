@@ -18,14 +18,16 @@ include(ExternalProject)
 
 if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
   set(VCVER "")
-  if((MSVC_VERSION EQUAL 1910) OR (MSVC_VERSION EQUAL 1900))
-    set(VCVER "14")
-  elseif(MSVC_VERSION EQUAL 1800)
-    set(VCVER "12")
-  elseif(MSVC_VERSION EQUAL 1700)
-    set(VCVER "11")
-  elseif(MSVC_VERSION EQUAL 1600)
+  if(MSVC_VERSION LESS 1600)
+    message(FATAL_ERROR "Unknown Visual Studio.")
+  elseif(MSVC_VERSION LESS 1700)  # vs2010
     set(VCVER "10")
+  elseif(MSVC_VERSION LESS 1800)  # vs2012
+    set(VCVER "11")
+  elseif(MSVC_VERSION LESS 1900)  # vs2013
+    set(VCVER "12")
+  elseif(MSVC_VERSION LESS_EQUAL 1911)  # vs2015 and vs2017
+    set(VCVER "14")
   else()
     message(FATAL_ERROR "Unknown Visual Studio.")
   endif()
