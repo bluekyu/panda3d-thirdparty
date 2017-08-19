@@ -2,8 +2,11 @@
 # to the respective authors for going through the work of figuring this out!
 
 cmake_minimum_required(VERSION 2.8.3)
+project(panda3d-thirdparty)
 
 option(build_minimal "Build with minimal thirdparty" OFF)
+set(thirdparty_list zlib png assimp bullet freetype ogg vorbis openal jpeg squish fcollada
+    vrpn tiff eigen ode artoolkit nvidiacg openssl openexr ffmpeg)
 option(use_jpeg "Use JPEG" ON)
 option(use_squish "Use Squish" ON)
 option(use_assimp "Use Assimp" ON)
@@ -38,27 +41,27 @@ if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
   else()
     message(FATAL_ERROR "Unknown Visual Studio.")
   endif()
-  set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/win-libs-vc${VCVER})
+  set(THIRDPARTY_DIR ${PROJECT_BINARY_DIR}/win-libs-vc${VCVER})
 
   if(CMAKE_GENERATOR MATCHES "Win64$")
     set(THIRDPARTY_DIR "${THIRDPARTY_DIR}-x64")
   endif()
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-  set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/darwin-libs-a)
+  set(THIRDPARTY_DIR ${PROJECT_BINARY_DIR}/darwin-libs-a)
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/linux-libs-x64)
+    set(THIRDPARTY_DIR ${PROJECT_BINARY_DIR}/linux-libs-x64)
   else()
-    set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/linux-libs-a)
+    set(THIRDPARTY_DIR ${PROJECT_BINARY_DIR}/linux-libs-a)
   endif()
 
 elseif(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/freebsd-libs-x64)
+    set(THIRDPARTY_DIR ${PROJECT_BINARY_DIR}/freebsd-libs-x64)
   else()
-    set(THIRDPARTY_DIR ${CMAKE_SOURCE_DIR}/freebsd-libs-a)
+    set(THIRDPARTY_DIR ${PROJECT_BINARY_DIR}/freebsd-libs-a)
   endif()
 
 else()
@@ -528,3 +531,5 @@ if(NOT WIN32)
   )
 endif()
 endif()
+
+install(DIRECTORY "${THIRDPARTY_DIR}" DESTINATION ".")
