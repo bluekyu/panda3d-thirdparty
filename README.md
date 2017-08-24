@@ -1,3 +1,16 @@
+# Panda3D Third-party
+
+## Build Status
+
+| OS       | Build Status | Latest Build |
+| :------: | :----------: | :----------: |
+| Windows  | [![win-badge]][win-link] | [Download][win-download] |
+
+[win-badge]: https://ci.appveyor.com/api/projects/status/4bq68rpiw5dr27y4/branch/develop?svg=true "AppVeyor build status"
+[win-link]: https://ci.appveyor.com/project/bluekyu/panda3d-thirdparty/branch/develop "asdf"
+[win-download]: https://ci.appveyor.com/api/projects/bluekyu/panda3d-thirdparty/artifacts/panda3d-thirdparty.zip?branch=develop "Download latest build"
+
+## Guide
 This repository contains a CMake script to build the thirdparty packages that
 are necessary for building Panda3D.
 
