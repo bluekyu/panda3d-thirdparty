@@ -24,8 +24,6 @@ init:
 
     cmake --version
 
-    set PATH=C:\Python36-x64;%PATH%
-
     python --version
 
 # clone directory
@@ -36,6 +34,7 @@ environment:
   CMAKE_PREFIX_PATH: C:\projects\_install
   BOOST_ROOT: C:\Libraries\boost_1_64_0
   FREETYPE_DIR: C:\projects\_install\panda3d-thirdparty\win-libs-vc14-x64\freetype
+  PATH: C:\Python36-x64;%PATH%
 
 # build cache to preserve files/folders between builds
 cache:
