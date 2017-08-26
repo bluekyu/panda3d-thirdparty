@@ -20,6 +20,9 @@ image: Visual Studio 2017
 # build platform, i.e. x86, x64, Any CPU. This setting is optional.
 platform: x64
 
+# set clone depth
+clone_depth: 1
+
 # clone directory
 clone_folder: c:\projects\panda3d-thirdparty
 
@@ -28,32 +31,16 @@ init:
 - ps: >-
     if (Test-Path env:TRIGGER_NAME) {
       Update-AppveyorBuild -Message "Build from $env:TRIGGER_COMMIT in $env:TRIGGER_NAME"
-    }
-
-    else {
+    } else {
       Set-AppveyorBuildVariable -Name 'TRIGGER_NAME' -Value "$env:APPVEYOR_PROJECT_NAME"
       Set-AppveyorBuildVariable -Name 'TRIGGER_COMMIT' -Value "$env:APPVEYOR_REPO_COMMIT".substring(0, 8)
     }
-
-    git --version
-
-    python --version
-
-    cmake --version
+- ps: git --version
+- ps: cmake --version
 
 # environment variables
 environment:
-  CMAKE_PREFIX_PATH: C:\projects\_install;C:\projects\_cache;
-  BOOST_ROOT: C:\Libraries\boost_1_64_0
-  FREETYPE_DIR: C:\projects\_install\panda3d-thirdparty\win-libs-vc14-x64\freetype
-  PATH: C:\Python36-x64;%PATH%
-
-# scripts that run after cloning repository
-install:
-- cmd: >-
-    git clone --depth 1 "https://github.com/bluekyu/render_pipeline_cpp_ci.git" c:\projects\render_pipeline_cpp_ci
-
-    mklink /J c:\projects\render_pipeline_cpp_ci\panda3d-thirdparty C:\projects\panda3d-thirdparty
+    CMAKE_PREFIX_PATH: C:\projects\_install;C:\projects\_cache;
 
 # build cache to preserve files/folders between builds
 cache:
@@ -65,10 +52,20 @@ cache:
 
 # to run your custom scripts instead of automatic MSBuild
 build_script:
-- cmd: >-
-    cd c:\projects\render_pipeline_cpp_ci
+- ps: (mkdir _build) -and (pushd _build)
+- ps: >-
+    cmake -G "Visual Studio 15 2017 Win64" -Wno-dev
+    -DCMAKE_INSTALL_PREFIX="C:/projects/panda3d-thirdparty/_artifacts"
+    ..
+- ps: cmake --build . --config "Release" --target INSTALL
+- ps: popd
 
-    python build.py panda3d-thirdparty --cmake-generator "Visual Studio 15 2017 Win64" --install-prefix "C:/projects/_install" --cache-prefix "C:/projects/_cache" --artifacts-prefix "C:/projects/panda3d-thirdparty/_artifacts"
+#---------------------------------#
+#       tests configuration       #
+#---------------------------------#
+
+# to disable automatic tests
+test: off
 
 #---------------------------------#
 #      artifacts configuration    #

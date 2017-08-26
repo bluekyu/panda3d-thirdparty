@@ -4,15 +4,6 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(panda3d-thirdparty)
 
-option(build_minimal "Build with minimal thirdparty" OFF)
-set(thirdparty_list zlib png assimp bullet freetype ogg vorbis openal jpeg squish fcollada
-    vrpn tiff eigen ode artoolkit nvidiacg openssl openexr ffmpeg)
-option(use_jpeg "Use JPEG" ON)
-option(use_squish "Use Squish" ON)
-option(use_assimp "Use Assimp" ON)
-option(use_openal "Use OpenAL" ON)
-option(use_ogg "Use OGG" ON)
-option(use_vorbis "Use vorbis" ON)
 option(use_bullet "Use bullet" OFF)
 option(use_fcollada "Use fcollada" OFF)
 option(use_vrpn "Use vrpn" OFF)
@@ -150,7 +141,6 @@ ExternalProject_Add(
   INSTALL_DIR ${THIRDPARTY_DIR}/png
 )
 
-if(NOT build_minimal AND use_assimp)
 if(NOT APPLE)
   ExternalProject_Add(
     assimp
@@ -168,9 +158,8 @@ if(NOT APPLE)
     INSTALL_DIR ${THIRDPARTY_DIR}/assimp
   )
 endif()
-endif()
 
-if(NOT build_minimal AND use_bullet)
+if(use_bullet)
 ExternalProject_Add(
   bullet
   #GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
@@ -206,7 +195,6 @@ ExternalProject_Add(
   INSTALL_DIR ${THIRDPARTY_DIR}/freetype
 )
 
-if(NOT build_minimal AND use_ogg)
 ExternalProject_Add(
   ogg
   URL http://downloads.xiph.org/releases/ogg/libogg-1.3.2.tar.gz
@@ -217,9 +205,7 @@ ExternalProject_Add(
   CMAKE_ARGS ${COMMON_CMAKE_ARGS}
   INSTALL_DIR ${THIRDPARTY_DIR}/vorbis
 )
-endif()
 
-if(NOT build_minimal AND use_vorbis)
 ExternalProject_Add(
   vorbis
   DEPENDS ogg
@@ -232,9 +218,7 @@ ExternalProject_Add(
     -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/vorbis
   INSTALL_DIR ${THIRDPARTY_DIR}/vorbis
 )
-endif()
 
-if(NOT build_minimal AND use_openal)
 ExternalProject_Add(
   openal
   GIT_REPOSITORY https://github.com/kcat/openal-soft.git
@@ -252,9 +236,7 @@ ExternalProject_Add(
     -DALSOFT_UTILS=OFF
   INSTALL_DIR ${THIRDPARTY_DIR}/openal
 )
-endif()
 
-if(NOT build_minimal AND use_jpeg)
 ExternalProject_Add(
   jpeg
   URL http://www.ijg.org/files/jpegsrc.v9b.tar.gz
@@ -269,9 +251,7 @@ ExternalProject_Add(
     -DBUILD_TESTS=OFF
   INSTALL_DIR ${THIRDPARTY_DIR}/jpeg
 )
-endif()
 
-if(NOT build_minimal AND use_squish)
 ExternalProject_Add(
   squish
   DEPENDS png
@@ -284,9 +264,8 @@ ExternalProject_Add(
     -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/png
   INSTALL_DIR ${THIRDPARTY_DIR}/squish
 )
-endif()
 
-if(NOT build_minimal AND use_fcollada)
+if(use_fcollada)
 ExternalProject_Add(
   fcollada
   GIT_REPOSITORY https://github.com/rdb/fcollada.git
@@ -298,7 +277,7 @@ ExternalProject_Add(
 )
 endif()
 
-if(NOT build_minimal AND use_vrpn)
+if(use_vrpn)
 ExternalProject_Add(
   vrpn
   # Pull from git since 7.33 has some compile issues
@@ -321,7 +300,7 @@ ExternalProject_Add(
 )
 endif()
 
-if(NOT build_minimal AND use_tiff)
+if(use_tiff)
 ExternalProject_Add(
   tiff
   DEPENDS zlib jpeg
@@ -355,7 +334,7 @@ ExternalProject_Add(
   INSTALL_DIR ${THIRDPARTY_DIR}/eigen
 )
 
-if(NOT build_minimal AND use_ode)
+if(use_ode)
 ExternalProject_Add(
   ode
   URL https://bitbucket.org/odedevs/ode/downloads/ode-0.13.1.tar.gz
@@ -369,7 +348,7 @@ ExternalProject_Add(
 )
 endif()
 
-if(NOT build_minimal AND use_artoolkit)
+if(use_artoolkit)
 ExternalProject_Add(
   artoolkit
   URL http://www.panda3d.org/download/noversion/ARToolKit-2.72.1.tgz
@@ -383,7 +362,7 @@ ExternalProject_Add(
 )
 endif()
 
-if(NOT build_minimal AND use_nvidiacg)
+if(use_nvidiacg)
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     ExternalProject_Add(
@@ -447,7 +426,7 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
 endif()
 endif()
 
-if(NOT build_minimal AND use_openssl)
+if(use_openssl)
 if(MSVC)
   if(CMAKE_SIZEOF_VOID_P EQUAL 8)
     set(ssl_config VC-WIN64A)
@@ -492,7 +471,7 @@ if(NOT APPLE)
 endif()
 endif()
 
-if(NOT build_minimal AND use_openexr)
+if(use_openexr)
 ExternalProject_Add(
   openexr
   DEPENDS zlib
@@ -515,7 +494,7 @@ ExternalProject_Add_Step(openexr remove_extras
 )
 endif()
 
-if(NOT build_minimal AND use_ffmpeg)
+if(use_ffmpeg)
 if(NOT WIN32)
   EXTERNALPROJECT_ADD(
     ffmpeg
