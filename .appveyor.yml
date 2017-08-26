@@ -53,11 +53,11 @@ cache:
 # to run your custom scripts instead of automatic MSBuild
 build_script:
 - ps: (mkdir _build) -and (pushd _build)
-- ps: >-
+- cmd: >-
     cmake -G "Visual Studio 15 2017 Win64" -Wno-dev
     -DCMAKE_INSTALL_PREFIX="C:/projects/panda3d-thirdparty/_artifacts"
     ..
-- ps: cmake --build . --config "Release" --target INSTALL
+- cmd: cmake --build . --config "Release" --target INSTALL
 - ps: popd
 
 #---------------------------------#
