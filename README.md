@@ -1,6 +1,16 @@
 # Panda3D Third-party
 
-[![Build status](https://ci.appveyor.com/api/projects/status/4bq68rpiw5dr27y4/branch/develop?svg=true)](https://ci.appveyor.com/project/bluekyu/panda3d-thirdparty/branch/develop)
+#### Build Status
+
+| OS       | Build Status             | Latest Build         |
+| :------: | :----------------------: | :------------------: |
+| Windows  | [![win-badge]][win-link] | [vc14][win-download] |
+
+[win-badge]: https://ci.appveyor.com/api/projects/status/4bq68rpiw5dr27y4/branch/develop?svg=true "AppVeyor build status"
+[win-link]: https://ci.appveyor.com/project/bluekyu/panda3d-thirdparty/branch/develop "AppVeyor build link"
+[win-download]: https://ci.appveyor.com/api/projects/bluekyu/panda3d-thirdparty/artifacts/panda3d-thirdparty.7z?branch=develop "Download latest build"
+
+**Note**: These builds are default builds, not everything. So, some files may be omitted.
 
 
 
