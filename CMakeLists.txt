@@ -7,12 +7,10 @@ project(panda3d-thirdparty)
 option(use_bullet "Use bullet" OFF)
 option(use_fcollada "Use fcollada" OFF)
 option(use_vrpn "Use vrpn" OFF)
-option(use_tiff "Use tiff" OFF)
 option(use_ode "Use ode" OFF)
 option(use_artoolkit "Use artoolkit" OFF)
 option(use_nvidiacg "Use nvidiacg" OFF)
 option(use_openssl "Use openssl" OFF)
-option(use_openexr "Use openexr" OFF)
 option(use_ffmpeg "Use ffmpeg" OFF)
 
 include(ExternalProject)
@@ -300,7 +298,6 @@ ExternalProject_Add(
 )
 endif()
 
-if(use_tiff)
 ExternalProject_Add(
   tiff
   DEPENDS zlib jpeg
@@ -319,7 +316,6 @@ ExternalProject_Add_Step(tiff remove_extras
   COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/share"
   DEPENDEES install
 )
-endif()
 
 ExternalProject_Add(
   eigen
@@ -471,7 +467,6 @@ if(NOT APPLE)
 endif()
 endif()
 
-if(use_openexr)
 ExternalProject_Add(
   openexr
   DEPENDS zlib
@@ -492,7 +487,6 @@ ExternalProject_Add_Step(openexr remove_extras
   COMMAND ${CMAKE_COMMAND} -E remove_directory "<INSTALL_DIR>/share"
   DEPENDEES install
 )
-endif()
 
 if(use_ffmpeg)
 if(NOT WIN32)
