@@ -12,24 +12,26 @@ option(use_artoolkit "Use artoolkit" OFF)
 option(use_nvidiacg "Use nvidiacg" OFF)
 option(use_openssl "Use openssl" OFF)
 option(use_ffmpeg "Use ffmpeg" OFF)
+option(build_mixfordebug "Build for MixForDebug configuration" OFF)
 
 include(ExternalProject)
 
 if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
   set(VCVER "")
-  if(MSVC_VERSION LESS 1600)
+  if(MSVC_VERSION GREATER_EQUAL 1920)
     message(FATAL_ERROR "Unknown Visual Studio.")
-  elseif(MSVC_VERSION LESS 1700)  # vs2010
-    set(VCVER "10")
-  elseif(MSVC_VERSION LESS 1800)  # vs2012
-    set(VCVER "11")
-  elseif(MSVC_VERSION LESS 1900)  # vs2013
-    set(VCVER "12")
-  elseif(MSVC_VERSION LESS_EQUAL 1911)  # vs2015 and vs2017
+  elseif(MSVC_VERSION GREATER_EQUAL 1900)    # vs2015 and vs2017
     set(VCVER "14")
+  elseif(MSVC_VERSION GREATER_EQUAL 1800)    # vs2013
+    set(VCVER "12")
+  elseif(MSVC_VERSION GREATER_EQUAL 1700)    # vs2012
+    set(VCVER "11")
+  elseif(MSVC_VERSION GREATER_EQUAL 1600)    # vs2010
+    set(VCVER "10")
   else()
     message(FATAL_ERROR "Unknown Visual Studio.")
   endif()
+
   set(THIRDPARTY_DIR ${PROJECT_BINARY_DIR}/win-libs-vc${VCVER})
 
   if(CMAKE_GENERATOR MATCHES "Win64$")
@@ -140,6 +142,26 @@ ExternalProject_Add(
 )
 
 if(NOT APPLE)
+  if(build_mixfordebug)
+  ExternalProject_Add(
+    assimp
+    DEPENDS zlib
+    GIT_REPOSITORY https://github.com/rdb/assimp.git
+    GIT_TAG not-broken
+    GIT_PROGRESS 1
+
+    CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+      -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
+      -DASSIMP_BUILD_TESTS=OFF
+      -DASSIMP_BUILD_ASSIMP_TOOLS=OFF
+      -DASSIMP_NO_EXPORT=ON
+      -DLIBRARY_SUFFIX=
+    INSTALL_DIR ${THIRDPARTY_DIR}/assimp
+
+    BUILD_COMMAND ${CMAKE_COMMAND} --build "<BINARY_DIR>" --config "Debug"
+    INSTALL_COMMAND ${CMAKE_COMMAND} --build "<BINARY_DIR>" --config "Debug" --target install
+  )
+  else()
   ExternalProject_Add(
     assimp
     DEPENDS zlib
@@ -155,6 +177,7 @@ if(NOT APPLE)
       -DLIBRARY_SUFFIX=
     INSTALL_DIR ${THIRDPARTY_DIR}/assimp
   )
+  endif()
 endif()
 
 if(use_bullet)
@@ -467,6 +490,24 @@ if(NOT APPLE)
 endif()
 endif()
 
+if(build_mixfordebug)
+ExternalProject_Add(
+  openexr
+  DEPENDS zlib
+  URL https://github.com/openexr/openexr/archive/v2.2.0.tar.gz
+  URL_HASH SHA256=8c219754af33fee199bdd72a0441f73dd4b3ce5363ac3c5cd7b2c6306f5442a6
+
+  PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/openexr.cmake <SOURCE_DIR>/CMakeLists.txt
+
+  CMAKE_ARGS ${COMMON_CMAKE_ARGS}
+    -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
+    -DNAMESPACE_VERSIONING=OFF
+  INSTALL_DIR ${THIRDPARTY_DIR}/openexr
+
+  BUILD_COMMAND ${CMAKE_COMMAND} --build "<BINARY_DIR>" --config "Debug"
+  INSTALL_COMMAND ${CMAKE_COMMAND} --build "<BINARY_DIR>" --config "Debug" --target install
+)
+else()
 ExternalProject_Add(
   openexr
   DEPENDS zlib
@@ -480,6 +521,7 @@ ExternalProject_Add(
     -DNAMESPACE_VERSIONING=OFF
   INSTALL_DIR ${THIRDPARTY_DIR}/openexr
 )
+endif()
 
 # Remove the extra bin and share directories it created.
 ExternalProject_Add_Step(openexr remove_extras

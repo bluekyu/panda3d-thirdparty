@@ -10,10 +10,8 @@ version: '{branch}-{build}'
 #---------------------------------#
 
 # Build worker image (VM template)
-image: Visual Studio 2017
-
-# build platform, i.e. x86, x64, Any CPU. This setting is optional.
-platform: x64
+image:
+- Visual Studio 2017
 
 # set clone depth
 clone_depth: 1
@@ -38,6 +36,10 @@ environment:
     CMAKE_PREFIX_PATH: C:\projects\_install;C:\projects\_cache;
     CMAKE_GENERATOR: Visual Studio 15 2017 Win64
 
+# this is how to allow failing jobs in the matrix
+matrix:
+    fast_finish: true   # set this flag to immediately finish build once one of the jobs fails.
+
 # build cache to preserve files/folders between builds
 cache:
     - C:\projects\_cache
@@ -46,13 +48,29 @@ cache:
 #       build configuration       #
 #---------------------------------#
 
+# build platform, i.e. x86, x64, Any CPU. This setting is optional.
+platform: x64
+
+# build Configuration, i.e. Debug, Release, etc.
+configuration:
+- MixForDebug
+- Release
+
+build:
+    parallel: true                  # enable MSBuild parallel builds
+
 # to run your custom scripts instead of automatic MSBuild
 build_script:
 - ps: (mkdir _build) -and (pushd _build)
 - cmd: >-
-    cmake -G "%CMAKE_GENERATOR%" -Wno-dev
+    if "%CONFIGURATION%"=="MixForDebug" (
+    cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
     -DCMAKE_INSTALL_PREFIX="C:/projects/_install/panda3d-thirdparty"
-    ..
+    -Dbuild_mixfordebug=ON
+    ) else (
+    cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
+    -DCMAKE_INSTALL_PREFIX="C:/projects/_install/panda3d-thirdparty"
+    )
 - cmake --build . --config "Release" --target INSTALL
 - ps: popd
 
@@ -74,13 +92,21 @@ artifacts:
 - path: panda3d-thirdparty.7z
 
 #---------------------------------#
+#     deployment configuration    #
+#---------------------------------#
+
+deploy: off
+
+#---------------------------------#
 #        global handlers          #
 #---------------------------------#
 
 # on successful build
 on_success:
 - ps: >-
-    Start-AppveyorBuild -ApiKey $env:api_key -ProjectSlug 'panda3d' -EnvironmentVariables @{
-        RIGGER_NAME = $env:TRIGGER_NAME
-        TRIGGER_COMMIT = $env:TRIGGER_COMMIT
+    if (($env:CONFIGURATION -eq "Release") -and ($env:APPVEYOR_REPO_BRANCH -eq "develop")) {
+        Start-AppveyorBuild -ApiKey $env:api_key -ProjectSlug 'panda3d' -EnvironmentVariables @{
+            RIGGER_NAME = $env:TRIGGER_NAME
+            TRIGGER_COMMIT = $env:TRIGGER_COMMIT
+        }
     }
