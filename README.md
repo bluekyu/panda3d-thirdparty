@@ -43,15 +43,17 @@ Some packages are still forthcoming.  The included packages are ticked.
 - [x] bullet
 - [x] eigen
 - [x] fcollada
-- [x] ffmpeg (except Windows)
+- [x] ffmpeg
 - [ ] fmodex
 - [x] freetype
+- [x] harfbuzz
 - [x] jpeg
 - [x] nvidiacg
 - [x] ode
 - [x] openal
 - [x] openexr
 - [x] openssl (except Mac)
+- [ ] opus
 - [x] png
 - [ ] rocket
 - [x] squish
@@ -59,3 +61,7 @@ Some packages are still forthcoming.  The included packages are ticked.
 - [x] vorbis
 - [x] vrpn
 - [x] zlib
+
+A package can be explicitly disabled using the `BUILD_*` options, eg. `-DBUILD_VRPN=OFF` disables building VRPN.  Note that some packages have dependencies on other packages, so not all combinations are valid.
+
+To build nothing but eg. vrpn, specify: `-DDISABLE_ALL=ON -DBUILD_VRPN=ON`.  This only affects the initial configuration.
