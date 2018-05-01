@@ -119,9 +119,10 @@ endif(APPLE)
 if(BUILD_ZLIB)
   ExternalProject_Add(
     zlib
-    #GIT_REPOSITORY https://github.com/madler/zlib.git
-    URL https://github.com/madler/zlib/archive/v1.2.11.tar.gz
-    URL_HASH SHA256=629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff
+    GIT_REPOSITORY https://github.com/madler/zlib.git
+    GIT_TAG cacf7f1d4e3d44d871b605da3b647f07d718623f #v1.2.11
+    #URL https://github.com/madler/zlib/archive/v1.2.11.tar.gz
+    #URL_HASH SHA256=629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DZLIB_TESTS=OFF
@@ -156,9 +157,12 @@ if(BUILD_PNG)
   ExternalProject_Add(
     png
     DEPENDS zlib
-    #GIT_REPOSITORY https://github.com/glennrp/libpng.git
-    URL https://github.com/glennrp/libpng/archive/v1.6.28.tar.gz
-    URL_HASH SHA256=a8f0b08a99e8a8b1da43c28655647ff3c6b338388d6cdd608f4ee87a85cc6e08
+
+    # Please note that libpng 1.6.32+ requires CMake 3.0.2
+    GIT_REPOSITORY https://github.com/glennrp/libpng.git
+    GIT_TAG 9fcb846402d8692d25cb5286777a832ca852fa44 #v1.6.31
+    #URL https://github.com/glennrp/libpng/archive/v1.6.31.tar.gz
+    #URL_HASH SHA256=79c0391804c83a6e0b722c20be7c3a27aeb2fe09afbc3028abad243444c98aa0
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DCMAKE_PREFIX_PATH=${THIRDPARTY_DIR}/zlib
@@ -210,9 +214,10 @@ endif()
 if(BUILD_BULLET)
   ExternalProject_Add(
     bullet
-    #GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
-    URL https://github.com/bulletphysics/bullet3/archive/2.83.7.tar.gz
-    URL_HASH SHA256=919087c764d0e93555c6ef0830c8951a9caafea99f52ac8b366e96adbe0112ed
+    GIT_REPOSITORY https://github.com/bulletphysics/bullet3.git
+    GIT_TAG 2fb92bc40c16e4da5a9018479d4a8e1899702ab8 #v2.83.7
+    #URL https://github.com/bulletphysics/bullet3/archive/2.83.7.tar.gz
+    #URL_HASH SHA256=919087c764d0e93555c6ef0830c8951a9caafea99f52ac8b366e96adbe0112ed
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DINSTALL_LIBS=ON
@@ -576,8 +581,10 @@ if(BUILD_OPENEXR)
   ExternalProject_Add(
     openexr
     DEPENDS zlib
-    URL https://github.com/openexr/openexr/archive/v2.2.0.tar.gz
-    URL_HASH SHA256=8c219754af33fee199bdd72a0441f73dd4b3ce5363ac3c5cd7b2c6306f5442a6
+    GIT_REPOSITORY https://github.com/openexr/openexr.git
+    GIT_TAG dcaf5fdb4d1244d8e60a58832cfe9c54734a2257 #v2.2.1
+    URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
+    URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/openexr.cmake <SOURCE_DIR>/CMakeLists.txt
 
