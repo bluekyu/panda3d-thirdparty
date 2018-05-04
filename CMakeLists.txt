@@ -120,7 +120,7 @@ if(BUILD_ZLIB)
   ExternalProject_Add(
     zlib
     GIT_REPOSITORY https://github.com/madler/zlib.git
-    GIT_TAG cacf7f1d4e3d44d871b605da3b647f07d718623f #v1.2.11
+    GIT_TAG v1.2.11
     #URL https://github.com/madler/zlib/archive/v1.2.11.tar.gz
     #URL_HASH SHA256=629380c90a77b964d896ed37163f5c3a34f6e6d897311f1df2a7016355c45eff
 
@@ -160,7 +160,7 @@ if(BUILD_PNG)
 
     # Please note that libpng 1.6.32+ requires CMake 3.0.2
     GIT_REPOSITORY https://github.com/glennrp/libpng.git
-    GIT_TAG 9fcb846402d8692d25cb5286777a832ca852fa44 #v1.6.31
+    GIT_TAG v1.6.34
     #URL https://github.com/glennrp/libpng/archive/v1.6.31.tar.gz
     #URL_HASH SHA256=79c0391804c83a6e0b722c20be7c3a27aeb2fe09afbc3028abad243444c98aa0
 
@@ -304,7 +304,7 @@ if(BUILD_VORBIS)
   ExternalProject_Add(
     ogg
     GIT_REPOSITORY https://github.com/xiph/ogg.git
-    GIT_TAG dd85929dbe38be4b3876c9c0d6d5dcb7a128f388
+    GIT_TAG v1.3.3
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
     INSTALL_DIR ${THIRDPARTY_DIR}/vorbis
@@ -314,7 +314,7 @@ if(BUILD_VORBIS)
     vorbis
     DEPENDS ogg
     GIT_REPOSITORY https://github.com/xiph/vorbis.git
-    GIT_TAG 8ef0f8058854b2ef55d2d42bbe84487a9aadae12
+    GIT_TAG v1.3.6
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DOGG_ROOT=${THIRDPARTY_DIR}/vorbis
@@ -326,12 +326,7 @@ if(BUILD_OPENAL)
   ExternalProject_Add(
     openal
     GIT_REPOSITORY https://github.com/kcat/openal-soft.git
-    GIT_TAG e270a9784bdacecedb98312a4e2e9ef75ef7df62
-
-    # From CMake 3.11, "CHECK_INCLUDE_FILES" macro checks additional arguments, which causes CMake error.
-    # master branch has already this patch:
-    # https://github.com/kcat/openal-soft/commit/cae4b1a062b53dd25eba7caa41622be730106749
-    PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/openal.cmake <SOURCE_DIR>/CMakeLists.txt
+    GIT_TAG 1fb6428ffa2fe7030c3ccdffbe985ff184af0829
 
     CMAKE_ARGS ${COMMON_CMAKE_ARGS}
       -DLIBTYPE=STATIC
@@ -587,9 +582,9 @@ if(BUILD_OPENEXR)
     openexr
     DEPENDS zlib
     GIT_REPOSITORY https://github.com/openexr/openexr.git
-    GIT_TAG dcaf5fdb4d1244d8e60a58832cfe9c54734a2257 #v2.2.1
-    URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
-    URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
+    GIT_TAG v2.2.1
+    #URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
+    #URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/openexr.cmake <SOURCE_DIR>/CMakeLists.txt
 
@@ -605,8 +600,10 @@ if(BUILD_OPENEXR)
   ExternalProject_Add(
     openexr
     DEPENDS zlib
-    URL https://github.com/openexr/openexr/archive/v2.2.0.tar.gz
-    URL_HASH SHA256=8c219754af33fee199bdd72a0441f73dd4b3ce5363ac3c5cd7b2c6306f5442a6
+    GIT_REPOSITORY https://github.com/openexr/openexr.git
+    GIT_TAG v2.2.1
+    #URL https://github.com/openexr/openexr/archive/v2.2.1.tar.gz
+    #URL_HASH SHA256=63ebc7677d63ad59f1ec205d149dff1da31e7e3c8e78e944458b1d371c7e2f3c
 
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_LIST_DIR}/openexr.cmake <SOURCE_DIR>/CMakeLists.txt
 
