@@ -431,8 +431,8 @@ endif()
 if(BUILD_EIGEN)
   ExternalProject_Add(
     eigen
-    URL https://bitbucket.org/eigen/eigen/get/3.2.8.tar.gz
-    URL_HASH SHA256=8d01d2d3a173c59065642a08d1dd661b399e4fed6edbda632143e7be937de7e0
+    URL https://bitbucket.org/eigen/eigen/get/3.3.4.tar.gz
+    URL_HASH SHA256=4286E8F1FABBD74F7EC6EF8EF31C9DBC6102B9248A8F8327B04F5B68DA5B05E1
 
     # No need to build anything; just copy over the Eigen directory.
     CONFIGURE_COMMAND ""
