@@ -63,11 +63,13 @@ build_script:
     if "%CONFIGURATION%"=="MixForDebug" (
     cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
     -DCMAKE_INSTALL_PREFIX="C:/projects/_install/panda3d-thirdparty"
+    -DBUILD_ASSIMP=OFF
     -DBUILD_ARTOOLKIT=OFF
     -DBUILD_BULLET=OFF
     -DBUILD_FCOLLADA=OFF
     -DBUILD_FFMPEG=OFF
     -DBUILD_NVIDIACG=OFF
+    -DBUILD_EIGEN=OFF
     -DBUILD_ODE=OFF
     -DBUILD_OPENSSL=OFF
     -DBUILD_VRPN=OFF
@@ -75,11 +77,13 @@ build_script:
     ) else (
     cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
     -DCMAKE_INSTALL_PREFIX="C:/projects/_install/panda3d-thirdparty"
+    -DBUILD_ASSIMP=OFF
     -DBUILD_ARTOOLKIT=OFF
     -DBUILD_BULLET=OFF
     -DBUILD_FCOLLADA=OFF
     -DBUILD_FFMPEG=OFF
     -DBUILD_NVIDIACG=OFF
+    -DBUILD_EIGEN=OFF
     -DBUILD_ODE=OFF
     -DBUILD_OPENSSL=OFF
     -DBUILD_VRPN=OFF
