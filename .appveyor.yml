@@ -88,7 +88,7 @@ build_script:
 - ps: popd
 
 after_build:
-- 7z a panda3d-thirdparty.7z "C:/projects/panda3d-thirdparty/win-libs-vc14"     # Visual Studio 14
+- 7z a panda3d-thirdparty.7z "C:/projects/panda3d-thirdparty/win-libs-vc14-x64"     # Visual Studio 14
 
 #---------------------------------#
 #       tests configuration       #
