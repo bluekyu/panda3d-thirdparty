@@ -57,6 +57,7 @@ build_script:
 - cmd: >-
     cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
     -DBUILD_EIGEN=OFF
+    -DBUILD_OPENAL=OFF
 - cmake --build . --config "Release" --target ALL_BUILD
 - ps: popd
 
