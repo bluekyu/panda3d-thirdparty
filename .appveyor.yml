@@ -29,6 +29,10 @@ environment:
     CMAKE_PREFIX_PATH: C:\projects\_install;C:\projects\_cache;
     CMAKE_GENERATOR: Visual Studio 14 2015 Win64
 
+    matrix:
+        - THIRDPARTY_GROUP: 0
+        - THIRDPARTY_GROUP: 1
+
 # this is how to allow failing jobs in the matrix
 matrix:
     fast_finish: true   # set this flag to immediately finish build once one of the jobs fails.
@@ -55,10 +59,32 @@ build:
 build_script:
 - ps: (mkdir _build) -and (pushd _build)
 - cmd: >-
+    if "%THIRDPARTY_GROUP%"=="0" (
     cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
-    -DBUILD_EIGEN=OFF
-    -DBUILD_OPENAL=OFF
-- cmake --build . --config "Release" --target ALL_BUILD
+    -DDISABLE_ALL=ON
+    -DBUILD_ZLIB=ON
+    -DBUILD_PNG=ON
+    -DBUILD_ASSIMP=ON
+    -DBUILD_HARFBUZZ=ON
+    -DBUILD_FREETYPE=ON
+    -DBUILD_VORBIS=ON
+    -DBUILD_JPEG=ON
+    -DBUILD_SQUISH=ON
+    -DBUILD_TIFF=ON
+    -DBUILD_OPENEXR=ON
+    -DBUILD_FFMPEG=ON
+    ) else (
+    cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
+    -DDISABLE_ALL=ON
+    -DBUILD_BULLET=ON
+    -DBUILD_FCOLLADA=ON
+    -DBUILD_VRPN=ON
+    -DBUILD_ODE=ON
+    -DBUILD_ARTOOLKIT=ON
+    -DBUILD_NVIDIACG=ON
+    -DBUILD_OPENSSL=ON
+    )
+- cmake --build . --config "Release"
 - ps: popd
 
 after_build:
