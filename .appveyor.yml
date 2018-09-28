@@ -11,13 +11,14 @@ version: '{branch}-{build}'
 
 # Build worker image (VM template)
 image:
+- Visual Studio 2015
+- Visual Studio 2017 Preview
 - Visual Studio 2017
+
 
 # set clone depth
 clone_depth: 1
 
-# clone directory
-clone_folder: c:\projects\panda3d-thirdparty
 
 # scripts that are called at very beginning, before repo cloning
 init:
@@ -28,18 +29,26 @@ init:
 - git --version
 - cmake --version
 
+
 # environment variables
 environment:
-    CMAKE_PREFIX_PATH: C:\projects\_install;C:\projects\_cache;
-    CMAKE_GENERATOR: Visual Studio 15 2017 Win64
+    INSTALL_PREFIX: C:/projects/_install
+
 
 # this is how to allow failing jobs in the matrix
 matrix:
     fast_finish: true   # set this flag to immediately finish build once one of the jobs fails.
+    allow_failures:
+        - image: Visual Studio 2017 Preview
+    exclude:
+        - configuration: MixForDebug
+          image: Visual Studio 2015
+        - configuration: MixForDebug
+          image: Visual Studio 2017 Preview
 
 # build cache to preserve files/folders between builds
-cache:
-    - C:\projects\_cache
+#cache:
+
 
 #---------------------------------#
 #       build configuration       #
@@ -58,11 +67,13 @@ build:
 
 # to run your custom scripts instead of automatic MSBuild
 build_script:
-- ps: (mkdir _build) -and (pushd _build)
+- ps: mkdir _build
+- ps: pushd _build
+
 - cmd: >-
     if "%CONFIGURATION%"=="MixForDebug" (
     cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
-    -DCMAKE_INSTALL_PREFIX="C:/projects/_install/panda3d-thirdparty"
+    -DCMAKE_INSTALL_PREFIX="%INSTALL_PREFIX%/panda3d-thirdparty"
     -DBUILD_ASSIMP=OFF
     -DBUILD_ARTOOLKIT=OFF
     -DBUILD_BULLET=OFF
@@ -76,7 +87,7 @@ build_script:
     -Dbuild_mixfordebug=ON
     ) else (
     cmake -G "%CMAKE_GENERATOR%" -Wno-dev ..
-    -DCMAKE_INSTALL_PREFIX="C:/projects/_install/panda3d-thirdparty"
+    -DCMAKE_INSTALL_PREFIX="%INSTALL_PREFIX%/panda3d-thirdparty"
     -DBUILD_ASSIMP=OFF
     -DBUILD_ARTOOLKIT=OFF
     -DBUILD_BULLET=OFF
@@ -88,18 +99,19 @@ build_script:
     -DBUILD_OPENSSL=OFF
     -DBUILD_VRPN=OFF
     )
-- cmake --build . --config "Release" --target INSTALL
-- ps: popd
+- cmd: cmake --build . --config "Release"
 
-after_build:
-- 7z a panda3d-thirdparty.7z "C:/projects/_install/panda3d-thirdparty"
+- ps: popd
 
 #---------------------------------#
 #       tests configuration       #
 #---------------------------------#
 
-# to disable automatic tests
-test: off
+test_script:
+
+after_test:
+- cmd: cmake --build _build --config "Release" --target install
+- cmd: 7z a panda3d-thirdparty.7z "%INSTALL_PREFIX%/panda3d-thirdparty"
 
 #---------------------------------#
 #      artifacts configuration    #
@@ -121,9 +133,29 @@ deploy: off
 # on successful build
 on_success:
 - ps: >-
-    if (($env:CONFIGURATION -eq "Release") -and ($env:APPVEYOR_REPO_BRANCH -eq "master")) {
+    if (($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") -and ($env:CONFIGURATION -eq "Release") -and ($env:APPVEYOR_REPO_BRANCH -eq "master")) {
         Start-AppveyorBuild -ApiKey $env:api_key -ProjectSlug 'panda3d' -EnvironmentVariables @{
             TRIGGER_NAME = $env:APPVEYOR_PROJECT_NAME
             TRIGGER_BUILD_VERSION = $env:APPVEYOR_BUILD_VERSION
         }
     }
+
+#---------------------------------#
+#       specializing matrix       #
+#---------------------------------#
+
+for:
+-
+    matrix:
+        only:
+            - image: Visual Studio 2015
+    environment:
+        CMAKE_GENERATOR: Visual Studio 14 2015 Win64
+
+-
+    matrix:
+        only:
+            - image: Visual Studio 2017
+            - image: Visual Studio 2017 Preview
+    environment:
+        CMAKE_GENERATOR: Visual Studio 15 2017 Win64

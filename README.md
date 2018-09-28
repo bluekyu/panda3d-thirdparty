@@ -2,9 +2,9 @@
 
 ## Build Status
 
-| OS       | Build Status             | Latest Build                                                  |
-| :------: | :----------------------: | :-----------------------------------------------------------: |
-| Windows  | [![win-badge]][win-link] | vc14 ([MixForDebug][win-mixfordebug], [Release][win-release]) |
+| OS       | Build Status             | Latest Build                                                   |
+| :------: | :----------------------: | :------------------------------------------------------------: |
+| Windows  | [![win-badge]][win-link] | vc141 ([MixForDebug][win-mixfordebug], [Release][win-release]) |
 
 [win-badge]: https://ci.appveyor.com/api/projects/status/4bq68rpiw5dr27y4/branch/master?svg=true "AppVeyor build status"
 [win-link]: https://ci.appveyor.com/project/bluekyu/panda3d-thirdparty/branch/master "AppVeyor build link"
