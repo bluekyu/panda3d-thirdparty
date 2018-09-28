@@ -8,8 +8,8 @@
 
 [win-badge]: https://ci.appveyor.com/api/projects/status/4bq68rpiw5dr27y4/branch/master?svg=true "AppVeyor build status"
 [win-link]: https://ci.appveyor.com/project/bluekyu/panda3d-thirdparty/branch/master "AppVeyor build link"
-[win-mixfordebug]: https://ci.appveyor.com/api/projects/bluekyu/panda3d-thirdparty/artifacts/panda3d-thirdparty.7z?branch=master&job=Configuration%3A+MixForDebug "Download latest build (MixForDebug)"
-[win-release]: https://ci.appveyor.com/api/projects/bluekyu/panda3d-thirdparty/artifacts/panda3d-thirdparty.7z?branch=master&job=Configuration%3A+Release "Download latest build (Release)"
+[win-mixfordebug]: https://ci.appveyor.com/api/projects/bluekyu/panda3d-thirdparty/artifacts/panda3d-thirdparty.7z?branch=master&job=Image%3A+Visual+Studio+2017%3B+Configuration%3A+MixForDebug "Download latest build (MixForDebug)"
+[win-release]: https://ci.appveyor.com/api/projects/bluekyu/panda3d-thirdparty/artifacts/panda3d-thirdparty.7z?branch=master&job=Image%3A+Visual+Studio+2017%3B+Configuration%3A+Release "Download latest build (Release)"
 
 ##### Note
 - These builds are default builds, not everything. So, some files may be omitted.
