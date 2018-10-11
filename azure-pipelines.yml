@@ -1,0 +1,56 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'VS2017-Win2016'
+
+  strategy:
+    matrix:
+      vc140_release:
+        BUILD_CONFIGURATION: 'release'
+        CMAKE_TOOLSET: 'v140,host=x64'
+      vc141_debug:
+        BUILD_CONFIGURATION: 'debug'
+        CMAKE_TOOLSET: 'host=x64'
+      vc141_release:
+        BUILD_CONFIGURATION: 'release'
+        CMAKE_TOOLSET: 'host=x64'
+
+  variables:
+    buildPlatform: 'x64'
+    CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
+
+  steps:
+  # configure & generate
+  - task: CMake@1
+    inputs:
+      cmakeArgs: .. -G "$(CMAKE_GENERATOR)" -Wno-dev -T $(CMAKE_TOOLSET) -DCMAKE_INSTALL_PREFIX="$(Build.BinariesDirectory)/panda3d-thirdparty"
+
+  # build
+  - task: CMake@1
+    inputs:
+      cmakeArgs: --build . --config $(BUILD_CONFIGURATION)
+
+  # tests
+  #- task
+
+  # install
+  - task: CMake@1
+    inputs:
+      cmakeArgs: --build . --config $(BUILD_CONFIGURATION) --target install
+
+  # packaging
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(Build.BinariesDirectory)/panda3d-thirdparty'
+      archiveType: '7z'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/panda3d-thirdparty.7z'
+
+  # publish
+  - task: PublishBuildArtifacts@1
+    inputs:
+      artifactName: artifacts
