@@ -1,3 +1,6 @@
+variables:
+  REPO_NAME: 'panda3d-thirdparty'
+
 jobs:
 - job: Windows
   pool:
@@ -6,32 +9,31 @@ jobs:
   strategy:
     matrix:
       vc140_release:
-        BUILD_TOOLSET: 'vc140'
+        BUILD_TOOLSET_VERSION: '140'
         BUILD_CONFIGURATION: 'release'
-        CMAKE_TOOLSET: 'v140,host=x64'
+        BUILD_MIX_FOR_DEBUG: 'OFF'
       vc141_debug:
-        BUILD_TOOLSET: 'vc141'
+        BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'debug'
-        CMAKE_TOOLSET: 'host=x64'
+        BUILD_MIX_FOR_DEBUG: 'ON'
       vc141_release:
-        BUILD_TOOLSET: 'vc141'
+        BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'release'
-        CMAKE_TOOLSET: 'host=x64'
+        BUILD_MIX_FOR_DEBUG: 'OFF'
 
   variables:
-    REPO_NAME: 'panda3d-thirdparty'
     CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
 
   steps:
   # configure & generate
   - task: CMake@1
     inputs:
-      cmakeArgs: .. -G "$(CMAKE_GENERATOR)" -Wno-dev -T $(CMAKE_TOOLSET) -DCMAKE_INSTALL_PREFIX="$(Build.BinariesDirectory)/$(REPO_NAME)"
+      cmakeArgs: .. -G "$(CMAKE_GENERATOR)" -Wno-dev -T "v$(BUILD_TOOLSET_VERSION),host=x64" -DCMAKE_INSTALL_PREFIX="$(Build.BinariesDirectory)/$(REPO_NAME)" -Dbuild_mixfordebug=$(BUILD_MIX_FOR_DEBUG)
 
   # build
   - task: CMake@1
     inputs:
-      cmakeArgs: --build . --config $(BUILD_CONFIGURATION)
+      cmakeArgs: --build . --config release
 
   # tests
   #- task
@@ -39,7 +41,7 @@ jobs:
   # install
   - task: CMake@1
     inputs:
-      cmakeArgs: --build . --config $(BUILD_CONFIGURATION) --target install
+      cmakeArgs: --build . --config release --target install
 
   # packaging
   - task: ArchiveFiles@2
@@ -51,4 +53,4 @@ jobs:
   # publish
   - task: PublishBuildArtifacts@1
     inputs:
-      artifactName: '$(REPO_NAME)-$(BUILD_TOOLSET)-$(BUILD_CONFIGURATION)'
+      artifactName: '$(REPO_NAME)-vc$(BUILD_TOOLSET_VERSION)-$(BUILD_CONFIGURATION)'
