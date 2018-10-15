@@ -11,9 +11,7 @@ version: '{branch}-{build}'
 
 # Build worker image (VM template)
 image:
-- Visual Studio 2015
 - Visual Studio 2017 Preview
-- Visual Studio 2017
 
 
 # set clone depth
@@ -38,13 +36,6 @@ environment:
 # this is how to allow failing jobs in the matrix
 matrix:
     fast_finish: true   # set this flag to immediately finish build once one of the jobs fails.
-    allow_failures:
-        - image: Visual Studio 2017 Preview
-    exclude:
-        - configuration: MixForDebug
-          image: Visual Studio 2015
-        - configuration: MixForDebug
-          image: Visual Studio 2017 Preview
 
 # build cache to preserve files/folders between builds
 #cache:
@@ -133,7 +124,7 @@ deploy: off
 # on successful build
 on_success:
 - ps: >-
-    if (($env:APPVEYOR_BUILD_WORKER_IMAGE -eq "Visual Studio 2017") -and ($env:CONFIGURATION -eq "Release") -and ($env:APPVEYOR_REPO_BRANCH -eq "master")) {
+    if (($env:CONFIGURATION -eq "Release") -and ($env:APPVEYOR_REPO_BRANCH -eq "master")) {
         Start-AppveyorBuild -ApiKey $env:api_key -ProjectSlug 'panda3d' -EnvironmentVariables @{
             TRIGGER_NAME = $env:APPVEYOR_PROJECT_NAME
             TRIGGER_BUILD_VERSION = $env:APPVEYOR_BUILD_VERSION
@@ -148,14 +139,6 @@ for:
 -
     matrix:
         only:
-            - image: Visual Studio 2015
-    environment:
-        CMAKE_GENERATOR: Visual Studio 14 2015 Win64
-
--
-    matrix:
-        only:
-            - image: Visual Studio 2017
             - image: Visual Studio 2017 Preview
     environment:
         CMAKE_GENERATOR: Visual Studio 15 2017 Win64
