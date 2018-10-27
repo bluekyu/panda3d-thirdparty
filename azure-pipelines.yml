@@ -28,7 +28,7 @@ jobs:
   # configure & generate
   - task: CMake@1
     inputs:
-      cmakeArgs: .. -G "$(CMAKE_GENERATOR)" -Wno-dev -T "v$(BUILD_TOOLSET_VERSION),host=x64" -DCMAKE_INSTALL_PREFIX="$(Build.BinariesDirectory)/$(REPO_NAME)" -Dbuild_mixfordebug=$(BUILD_MIX_FOR_DEBUG)
+      cmakeArgs: .. -G "$(CMAKE_GENERATOR)" -Wno-dev -T "v$(BUILD_TOOLSET_VERSION),host=x64" -DCMAKE_INSTALL_PREFIX="$(Build.BinariesDirectory)/thirdparty" -Dbuild_mixfordebug=$(BUILD_MIX_FOR_DEBUG)
 
   # build
   - task: CMake@1
@@ -46,9 +46,9 @@ jobs:
   # packaging
   - task: ArchiveFiles@2
     inputs:
-      rootFolderOrFile: '$(Build.BinariesDirectory)/$(REPO_NAME)'
+      rootFolderOrFile: '$(Build.BinariesDirectory)/thirdparty'
       archiveType: '7z'
-      archiveFile: '$(Build.ArtifactStagingDirectory)/$(REPO_NAME).7z'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/thirdparty.7z'
 
   # publish
   - task: PublishBuildArtifacts@1
