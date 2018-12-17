@@ -4,6 +4,15 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(panda3d-thirdparty)
 
+# Set defaults.  Must be before project().
+if(APPLE)
+  set(CMAKE_OSX_ARCHITECTURES "x86_64;i386" CACHE STRING "")
+  set(CMAKE_OSX_DEPLOYMENT_TARGET "10.6" CACHE STRING "")
+  set(CMAKE_OSX_SYSROOT /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX${CMAKE_OSX_DEPLOYMENT_TARGET}.sdk/ CACHE PATH "")
+endif()
+
+project(panda3d-thirdparty)
+
 include(ExternalProject)
 
 set(DEFAULT_ENABLE ON)
@@ -170,6 +179,7 @@ if(BUILD_PNG)
       -DPNG_STATIC=ON
       -DPNG_TESTS=OFF
       -DPNG_DEBUG=OFF
+      -DAWK= # Needed for multi-arch build on macOS
     INSTALL_DIR ${THIRDPARTY_DIR}/png
   )
 endif()
@@ -503,9 +513,12 @@ elseif(BUILD_NVIDIACG AND CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     nvidiacg
     URL http://www.panda3d.org/download/noversion/NVIDIA_Cg.tgz
     URL_HASH SHA256=cd6b12cca647749101b0286353095c7435251097d1aed0171cfc8afdcededd29
-    CONFIGURE_COMMAND ""
-    BUILD_COMMAND ""
-    INSTALL_COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/Library/Frameworks/Cg.framework <INSTALL_DIR>/Cg.framework
+
+    CONFIGURE_COMMAND chmod -R u+w <SOURCE_DIR>
+    BUILD_COMMAND install_name_tool -id @loader_path/../Frameworks/Cg.framework/Cg <SOURCE_DIR>/Library/Frameworks/Cg.framework/Cg
+    INSTALL_COMMAND rm -rf "<INSTALL_DIR>/Cg.framework"
+            COMMAND cp -R <SOURCE_DIR>/Library/Frameworks/Cg.framework <INSTALL_DIR>/Cg.framework
+
     INSTALL_DIR ${THIRDPARTY_DIR}/nvidiacg
   )
 elseif(BUILD_NVIDIACG AND CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -557,14 +570,57 @@ if(BUILD_OPENSSL AND MSVC)
 elseif(BUILD_OPENSSL AND NOT APPLE)
   ExternalProject_Add(
     openssl
-    URL https://www.openssl.org/source/openssl-1.0.2j.tar.gz
-    URL_HASH SHA256=e7aff292be21c259c6af26469c7a9b3ba26e9abaaffd325e3dccc9785256c431
+    URL https://www.openssl.org/source/openssl-1.0.2q.tar.gz
+    URL_HASH SHA256=5744cfcbcec2b1b48629f7354203bc1e5e9b5466998bbccc5b5fcde3b18eb684
 
     CONFIGURE_COMMAND ./config no-asm no-shared --prefix=<INSTALL_DIR> ${CMAKE_C_FLAGS}
     BUILD_COMMAND ${MAKE}
     BUILD_IN_SOURCE 1
 
     INSTALL_DIR ${THIRDPARTY_DIR}/openssl
+  )
+elseif(BUILD_OPENSSL AND APPLE)
+  set(ssl_flags ${CMAKE_C_FLAGS}
+                no-asm no-shared no-dso
+                -mmacosx-version-min=${CMAKE_OSX_DEPLOYMENT_TARGET})
+
+  if(CMAKE_OSX_SYSROOT)
+    set(ssl_flags ${ssl_flags} -isysroot=${CMAKE_OSX_SYSROOT} -I/usr/include)
+  endif()
+
+  ExternalProject_Add(
+    openssl-i386
+    URL https://www.openssl.org/source/openssl-1.0.2q.tar.gz
+    URL_HASH SHA256=5744cfcbcec2b1b48629f7354203bc1e5e9b5466998bbccc5b5fcde3b18eb684
+
+    CONFIGURE_COMMAND /usr/bin/perl ./Configure darwin-i386-cc ${ssl_flags}
+    BUILD_COMMAND make build_libs
+    BUILD_IN_SOURCE 1
+
+    INSTALL_COMMAND ""
+  )
+  ExternalProject_Add(
+    openssl
+    DEPENDS openssl-i386
+    URL https://www.openssl.org/source/openssl-1.0.2q.tar.gz
+    URL_HASH SHA256=5744cfcbcec2b1b48629f7354203bc1e5e9b5466998bbccc5b5fcde3b18eb684
+
+    CONFIGURE_COMMAND /usr/bin/perl ./Configure darwin64-x86_64-cc ${ssl_flags}
+    BUILD_COMMAND make build_libs
+    BUILD_IN_SOURCE 1
+
+    INSTALL_COMMAND ""
+  )
+  ExternalProject_Add_Step(openssl combine
+    COMMAND ${CMAKE_COMMAND} -E copy_directory <SOURCE_DIR>/include "${THIRDPARTY_DIR}/openssl/include"
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${THIRDPARTY_DIR}/openssl/lib"
+    COMMAND lipo -create -output "${THIRDPARTY_DIR}/openssl/lib/libcrypto.a"
+            -arch i386 "${CMAKE_CURRENT_BINARY_DIR}/openssl-i386-prefix/src/openssl-i386/libcrypto.a"
+            -arch x86_64 "${CMAKE_CURRENT_BINARY_DIR}/openssl-prefix/src/openssl/libcrypto.a"
+    COMMAND lipo -create -output "${THIRDPARTY_DIR}/openssl/lib/libssl.a"
+            -arch i386 "${CMAKE_CURRENT_BINARY_DIR}/openssl-i386-prefix/src/openssl-i386/libssl.a"
+            -arch x86_64 "${CMAKE_CURRENT_BINARY_DIR}/openssl-prefix/src/openssl/libssl.a"
+    DEPENDEES install
   )
 endif()
 
