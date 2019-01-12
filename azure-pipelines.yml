@@ -10,42 +10,64 @@ jobs:
     matrix:
       vc140-x86-release:
         ARCHITECTURE_SUFFIX: ''
+        PANDA3D_TOOLS_SUFFIX: 'win32'
         BUILD_TOOLSET_VERSION: '140'
         BUILD_CONFIGURATION: 'release'
         BUILD_MIX_FOR_DEBUG: 'OFF'
         CMAKE_GENERATOR: 'Visual Studio 15 2017'
       vc140-x64-release:
         ARCHITECTURE_SUFFIX: '-x64'
+        PANDA3D_TOOLS_SUFFIX: 'win64'
         BUILD_TOOLSET_VERSION: '140'
         BUILD_CONFIGURATION: 'release'
         BUILD_MIX_FOR_DEBUG: 'OFF'
         CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
       vc141-x86-debug:
         ARCHITECTURE_SUFFIX: ''
+        PANDA3D_TOOLS_SUFFIX: 'win32'
         BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'debug'
         BUILD_MIX_FOR_DEBUG: 'ON'
         CMAKE_GENERATOR: 'Visual Studio 15 2017'
       vc141-x86-release:
         ARCHITECTURE_SUFFIX: ''
+        PANDA3D_TOOLS_SUFFIX: 'win32'
         BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'release'
         BUILD_MIX_FOR_DEBUG: 'OFF'
         CMAKE_GENERATOR: 'Visual Studio 15 2017'
       vc141-x64-debug:
         ARCHITECTURE_SUFFIX: '-x64'
+        PANDA3D_TOOLS_SUFFIX: 'win64'
         BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'debug'
         BUILD_MIX_FOR_DEBUG: 'ON'
         CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
       vc141-x64-release:
         ARCHITECTURE_SUFFIX: '-x64'
+        PANDA3D_TOOLS_SUFFIX: 'win64'
         BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'release'
         BUILD_MIX_FOR_DEBUG: 'OFF'
         CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
 
   steps:
+  # download tools
+  - script: curl "https://www.panda3d.org/download/panda3d-1.10.0/panda3d-1.10.0-tools-$(PANDA3D_TOOLS_SUFFIX).zip" -o "panda3d-tools.zip"
+    displayName: Download Panda3D Tools
+  
+  # extract tools
+  - task: ExtractFiles@1
+    displayName: Extract Panda3D Tools
+    inputs:
+      archiveFilePatterns: '$(Build.SourcesDirectory)/panda3d-tools.zip'
+      destinationFolder: '$(Build.SourcesDirectory)'
+      cleanDestinationFolder: false
+
+  # move tools
+  - script: move "$(Build.SourcesDirectory)\panda3d-1.10.0" "$(Build.BinariesDirectory)\thirdparty"
+    displayName: Move Panda3D Tools
+
   # configure & generate
   - task: CMake@1
     inputs:
@@ -55,9 +77,6 @@ jobs:
   - task: CMake@1
     inputs:
       cmakeArgs: --build . --config release
-
-  # tests
-  #- task
 
   # install
   - task: CMake@1
