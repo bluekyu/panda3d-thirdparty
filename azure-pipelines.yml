@@ -1,10 +1,11 @@
 variables:
   REPO_NAME: 'panda3d-thirdparty'
+  CMAKE_GENERATOR_PLATFORM: 'x64'
+  BUILD_CONFIGURATION: 'release'
+  BUILD_MIX_FOR_DEBUG: 'OFF'
 
 jobs:
 - job: Windows
-  pool:
-    vmImage: 'VS2017-Win2016'
 
   strategy:
     matrix:
@@ -12,50 +13,50 @@ jobs:
         ARCHITECTURE_SUFFIX: ''
         PANDA3D_TOOLS_SUFFIX: 'win32'
         BUILD_TOOLSET_VERSION: '140'
-        BUILD_CONFIGURATION: 'release'
-        BUILD_MIX_FOR_DEBUG: 'OFF'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017'
+        CMAKE_GENERATOR_PLATFORM: 'Win32'
       vc140-x64-release:
-        ARCHITECTURE_SUFFIX: '-x64'
-        PANDA3D_TOOLS_SUFFIX: 'win64'
         BUILD_TOOLSET_VERSION: '140'
-        BUILD_CONFIGURATION: 'release'
-        BUILD_MIX_FOR_DEBUG: 'OFF'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
       vc141-x86-debug:
         ARCHITECTURE_SUFFIX: ''
         PANDA3D_TOOLS_SUFFIX: 'win32'
-        BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'debug'
         BUILD_MIX_FOR_DEBUG: 'ON'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017'
+        CMAKE_GENERATOR_PLATFORM: 'Win32'
       vc141-x86-release:
         ARCHITECTURE_SUFFIX: ''
         PANDA3D_TOOLS_SUFFIX: 'win32'
-        BUILD_TOOLSET_VERSION: '141'
-        BUILD_CONFIGURATION: 'release'
-        BUILD_MIX_FOR_DEBUG: 'OFF'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017'
+        CMAKE_GENERATOR_PLATFORM: 'Win32'
       vc141-x64-debug:
-        ARCHITECTURE_SUFFIX: '-x64'
-        PANDA3D_TOOLS_SUFFIX: 'win64'
-        BUILD_TOOLSET_VERSION: '141'
         BUILD_CONFIGURATION: 'debug'
         BUILD_MIX_FOR_DEBUG: 'ON'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
       vc141-x64-release:
-        ARCHITECTURE_SUFFIX: '-x64'
-        PANDA3D_TOOLS_SUFFIX: 'win64'
         BUILD_TOOLSET_VERSION: '141'
-        BUILD_CONFIGURATION: 'release'
-        BUILD_MIX_FOR_DEBUG: 'OFF'
-        CMAKE_GENERATOR: 'Visual Studio 15 2017 Win64'
+      vc142-x64-debug:
+        VM_IMAGE_NAME: 'windows-2019'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        BUILD_CONFIGURATION: 'debug'
+        BUILD_MIX_FOR_DEBUG: 'ON'
+        BUILD_TOOLSET_VERSION: '142'
+      vc142-x64-release:
+        VM_IMAGE_NAME: 'windows-2019'
+        CMAKE_GENERATOR: 'Visual Studio 16 2019'
+        BUILD_TOOLSET_VERSION: '142'
+
+  variables:
+    VM_IMAGE_NAME: 'vs2017-win2016'
+    CMAKE_GENERATOR: 'Visual Studio 15 2017'
+    BUILD_TOOLSET_VERSION: '141'
+    ARCHITECTURE_SUFFIX: '-x64'
+    PANDA3D_TOOLS_SUFFIX: 'win64'
+
+  pool:
+    vmImage: $(VM_IMAGE_NAME)
 
   steps:
   # download tools
-  - script: curl "https://www.panda3d.org/download/panda3d-1.10.0/panda3d-1.10.0-tools-$(PANDA3D_TOOLS_SUFFIX).zip" -o "panda3d-tools.zip"
+  - script: curl "https://www.panda3d.org/download/panda3d-1.10.2/panda3d-1.10.2-tools-$(PANDA3D_TOOLS_SUFFIX).zip" -o "panda3d-tools.zip"
     displayName: Download Panda3D Tools
-  
+
   # extract tools
   - task: ExtractFiles@1
     displayName: Extract Panda3D Tools
@@ -65,13 +66,16 @@ jobs:
       cleanDestinationFolder: false
 
   # move tools
-  - script: move "$(Build.SourcesDirectory)\panda3d-1.10.0" "$(Build.BinariesDirectory)\thirdparty"
+  - script: move "$(Build.SourcesDirectory)\panda3d-1.10.2" "$(Build.BinariesDirectory)\thirdparty"
     displayName: Move Panda3D Tools
 
   # configure & generate
   - task: CMake@1
     inputs:
-      cmakeArgs: .. -G "$(CMAKE_GENERATOR)" -Wno-dev -T "v$(BUILD_TOOLSET_VERSION),host=x64" -DCMAKE_INSTALL_PREFIX="$(Build.BinariesDirectory)/thirdparty" -Dbuild_mixfordebug=$(BUILD_MIX_FOR_DEBUG)
+      cmakeArgs: >-
+        .. -G "$(CMAKE_GENERATOR)" -A $(CMAKE_GENERATOR_PLATFORM) -Wno-dev -T "v$(BUILD_TOOLSET_VERSION)"
+        -DCMAKE_INSTALL_PREFIX="$(Build.BinariesDirectory)/thirdparty"
+        -Dbuild_mixfordebug=$(BUILD_MIX_FOR_DEBUG)
 
   # build
   - task: CMake@1

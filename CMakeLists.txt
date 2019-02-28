@@ -53,9 +53,9 @@ option(build_mixfordebug "Build for MixForDebug configuration" OFF)
 
 if(CMAKE_GENERATOR MATCHES "^Visual Studio [0-9]+ ")
   set(VCVER "")
-  if(MSVC_VERSION GREATER_EQUAL 1920)
+  if(MSVC_VERSION GREATER_EQUAL 1930)
     message(FATAL_ERROR "Unknown Visual Studio.")
-  elseif(MSVC_VERSION GREATER_EQUAL 1900)    # vs2015 and vs2017
+  elseif(MSVC_VERSION GREATER_EQUAL 1900)    # vs2015, vs2017, vs2019
     set(VCVER "14")
   elseif(MSVC_VERSION GREATER_EQUAL 1800)    # vs2013
     set(VCVER "12")
