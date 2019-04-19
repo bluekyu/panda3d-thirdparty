@@ -7,8 +7,8 @@
 | [![azure-badge]][azure-link]       | Visual Studio 2015 and 2017 |
 | [![appveyor-badge]][appveyor-link] | Visual Studio 2017 Preview  |
 
-[azure-badge]: https://dev.azure.com/bluekyu/rpcpp-devops/_apis/build/status/panda3d/panda3d-thirdparty
-[azure-link]: https://dev.azure.com/bluekyu/rpcpp-devops/_build/latest?definitionId=2
+[azure-badge]: https://dev.azure.com/bluekyu/rpcpp-devops/_apis/build/status/panda3d/panda3d-thirdparty?branchName=master
+[azure-link]: https://dev.azure.com/bluekyu/rpcpp-devops/_build/latest?definitionId=2&branchName=master
 [appveyor-badge]: https://ci.appveyor.com/api/projects/status/4bq68rpiw5dr27y4/branch/master?svg=true "AppVeyor build status"
 [appveyor-link]: https://ci.appveyor.com/project/bluekyu/panda3d-thirdparty/branch/master "AppVeyor build link"
 
